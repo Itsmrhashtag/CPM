@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - CarPartMarketplace</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .card {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .form-input {
+            border-radius: 0.375rem;
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            width: 100%;
+            outline: none;
+            font-size: 1rem;
+            transition: border-color 0.15s ease-in-out, shadow-sm 0.15s ease-in-out;
+        }
+        .form-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+        .form-label {
+            margin-bottom: 0.5rem;
+            display: block;
+            font-weight: 500;
+            color: #4a5568;
+            font-size: 0.875rem;
+        }
+        .btn-primary {
+            background-color: #3b82f6;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.375rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.15s ease-in-out, transform 0.1s ease-in-out, shadow-sm 0.15s ease-in-out;
+            width: 100%;
+            display: block;
+            text-align: center;
+        }
+        .btn-primary:hover {
+            background-color: #2563eb;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+        }
+        .btn-primary:active {
+            background-color: #1e40af;
+            transform: translateY(0);
+            box-shadow: none;
+        }
+    </style>
+</head>
+<body class="bg-cover bg-center bg-no-repeat" style="background-image: url('https://images.unsplash.com/photo-1492144543567-39555e115fc3?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');">
+    <header class="bg-gray-800 text-white py-4">
+        <div class="container mx-auto px-4 text-center">
+            <h1 class="text-3xl font-semibold">CarPartMarketplace</h1>
+        </div>
+    </header>
+    <div class="min-h-screen flex items-center justify-center py-10">
+        <div class="card w-full max-w-md p-8">
+            <h1 class="text-2xl font-semibold mb-6 text-gray-800 text-center">Login to CarPartMarketplace</h1>
+            <form id="loginForm" action="http://localhost:8080/api/auth/login" method="POST" class="space-y-6">
+                <div>
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" id="email" name="email" class="form-input" placeholder="youremail@example.com" required>
+                </div>
+                <div>
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" id="password" name="password" class="form-input" placeholder="Password" required>
+                </div>
+                <button type="submit" class="btn-primary">Login</button>
+            </form>
+            <div class="mt-4 text-center text-gray-600">
+                Don't have an account? <a href="/register.html" class="text-blue-500 hover:underline">Register</a>
+            </div>
+        </div>
+    </div>
+    <script>
+        localStorage.clear();
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const formData = new FormData(this);
+            const data = {};
+            formData.forEach((value, key) => {
+                data[key] = value;
+            });
+
+            fetch('http://localhost:8080/api/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => {
+                        throw new Error(err.message || 'Login failed');
+                    });
+                }
+                return response.json();
+            })
+            .then(responseData => {
+                localStorage.setItem('user', JSON.stringify(responseData));
+                alert('Login successful!');
+                const userRole = responseData.user.role;
+                if (userRole === 'USER') {
+                    window.location.href = '/user-dashboard.html';
+                } else if (userRole === 'ADMIN') {
+                    window.location.href = '/admin-dashboard.html';
+                }else if (userRole === 'MECHANIC'){
+                    window.location.href = '/mechanic-dashboard.html'
+                }
+                 else {
+                    window.location.href = '/dashboard.html';
+                }
+            })
+            .catch(error => {
+                alert(error.message || 'An error occurred during login.');
+            });
+        });
+    </script>
+</body>
+</html>

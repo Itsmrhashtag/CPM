@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Orders - CarPartMarketplace</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+  <header class="bg-gray-800 text-white py-4">
+    <div class="container mx-auto px-4 text-center">
+      <h1 class="text-3xl font-semibold">📦 My Orders</h1>
+    </div>
+  </header>
+
+  <main class="container mx-auto px-4 py-8">
+    <div id="orders-container" class="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+      <!-- Orders will be inserted here -->
+    </div>
+  </main>
+
+  <script>
+    const user = localStorage.getItem("user");
+    if (!user) {
+      window.location.href = "/login.html";
+    }
+
+    const userData = JSON.parse(user);
+    const token = userData?.token;
+
+    async function fetchOrders() {
+      try {
+        const res = await fetch("http://localhost:8080/api/orders/summary", {
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        });
+
+        const orders = await res.json();
+        const container = document.getElementById("orders-container");
+
+        if (!orders.length) {
+          container.innerHTML = `<p class="text-center col-span-full text-lg">No orders yet.</p>`;
+          return;
+        }
+
+        orders.forEach(order => {
+          const card = document.createElement("div");
+          card.className = "bg-white rounded-lg shadow-md p-4";
+
+          const imageUrl = order.productImages?.length
+            ? `/images/${order.productImages[0]}`
+            : 'https://via.placeholder.com/150';
+
+          card.innerHTML = `
+            <img src="${imageUrl}" alt="Product Image" class="w-full h-40 object-cover rounded-md mb-4">
+            <h2 class="text-xl font-semibold mb-1">${order.productName}</h2>
+            <p class="text-gray-700 mb-2">${order.productDescription}</p>
+            <p><strong>Mechanic:</strong> ${order.mechanicRequested ? order.mechanicName || 'Assigned' : 'Not Requested'}</p>
+            <p><strong>Status:</strong> 
+              <span class="${order.paid ? 'text-green-600' : 'text-red-600'} font-semibold">
+                ${order.paid ? 'Paid' : 'Pending'}
+              </span>
+            </p>
+          `;
+
+          container.appendChild(card);
+        });
+      } catch (error) {
+        console.error("Error loading orders:", error);
+        document.getElementById("orders-container").innerHTML = `
+          <p class="text-red-500 text-center col-span-full">Failed to load orders. Please try again later.</p>
+        `;
+      }
+    }
+
+    fetchOrders();
+  </script>
+</body>
+</html>

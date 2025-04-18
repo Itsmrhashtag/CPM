@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Place Order</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://js.stripe.com/v3/"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .order-form {
+            background-color: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            color: #4a5568;
+            margin-bottom: 0.5rem;
+        }
+        .form-input, .form-select {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 0.375rem;
+            border: 1px solid #e2e8f0;
+            outline: none;
+            font-size: 1rem;
+            transition: border-color 0.15s ease-in-out, shadow-sm 0.15s ease-in-out;
+        }
+        .form-input:focus, .form-select:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+        .form-check-label {
+            margin-left: 0.5rem;
+            font-size: 1rem;
+            color: #4a5568;
+        }
+
+        .form-check-input{
+             margin-top: 0.25rem;
+            margin-left: 0;
+        }
+        .btn-primary {
+            background-color: #3b82f6;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.375rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.15s ease-in-out, transform 0.1s ease-in-out;
+            font-size: 1rem;
+            width: 100%;
+            text-align: center;
+        }
+        .btn-primary:hover {
+            background-color: #2563eb;
+            transform: translateY(-1px);
+        }
+
+        .btn-primary:disabled{
+            background-color: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        #payment-element {
+            margin-top: 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.375rem;
+            padding: 0.75rem;
+            background-color: white;
+        }
+
+        .order-summary {
+            background-color: #f7fafc;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-top: 1rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .order-summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+            color: #4a5568;
+        }
+        .order-summary-total{
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #1a202c;
+            margin-top: 1rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="container">
+        <h1 class="text-2xl font-semibold text-gray-800 mb-6 text-center">Place Order</h1>
+
+        <form id="order-form" class="order-form">
+            <div class="form-group">
+                <label for="product" class="form-label">Product</label>
+                <select id="product" name="productId" class="form-select" required>
+                    </select>
+            </div>
+
+            <div class="form-group">
+                <label for="mechanic-request" class="form-label">Do you need a mechanic?</label>
+                <div class="flex items-center">
+                    <input type="checkbox" id="mechanic-request" name="mechanicRequested" class="form-checkbox h-5 w-5 text-blue-600 rounded">
+                    <label for="mechanic-request" class="form-check-label">Yes, I need a mechanic</label>
+                </div>
+            </div>
+
+            <div class="form-group" id="mechanic-select-group" style="display: none;">
+                <label for="mechanic" class="form-label">Select Mechanic</label>
+                <select id="mechanic" name="mechanicId" class="form-select">
+                    </select>
+            </div>
+
+            <div class="form-group">
+                <label for="payment-element" class="form-label">Payment Details</label>
+                <div id="payment-element">
+                    </div>
+            </div>
+             <div class="order-summary" id="order-summary">
+                    <h2 class="text-lg font-semibold mb-4 text-gray-700">Order Summary</h2>
+                    <div class="order-summary-item">
+                        <span>Product:</span>
+                        <span id="order-summary-product" class="text-right"></span>
+                    </div>
+                    <div class="order-summary-item">
+                        <span>Mechanic Service:</span>
+                        <span id="order-summary-mechanic" class="text-right">No</span>
+                    </div>
+                    <div class="order-summary-total">
+                        <span>Total:</span>
+                        <span id="order-summary-total-price" class="text-right"></span>
+                    </div>
+                </div>
+
+            <button type="submit" id="submit-button" class="btn-primary">Place Order</button>
+        </form>
+
+        <div id="order-status" class="mt-4 text-center text-gray-700 font-medium">
+            </div>
+    </div>
+
+    <script>
+        // Stripe API key (replace with your actual publishable key)
+        const stripe = Stripe("pk_test_51OQYPiSHmDাধীনjB9LgT4qjM9P5gzp5fLp6LhHhEPUvJ4k6zzwMKaKzKXOeLgT6zL7v5d8L8hL9gT8jF8L9M005k9gE666");
+
+        const orderForm = document.getElementById('order-form');
+        const productSelect = document.getElementById('product');
+        const mechanicRequestCheckbox = document.getElementById('mechanic-request');
+        const mechanicSelectGroup = document.getElementById('mechanic-select-group');
+        const mechanicSelect = document.getElementById('mechanic');
+        const orderStatus = document.getElementById('order-status');
+        const submitButton = document.getElementById('submit-button');
+
+        const orderSummaryProductElement = document.getElementById('order-summary-product');
+        const orderSummaryMechanicElement = document.getElementById('order-summary-mechanic');
+        const orderSummaryTotalElement = document.getElementById('order-summary-total-price');
+        let selectedProductPrice = 0;
+
+        let elements;
+
+        // Fetch products and populate the product dropdown
+        fetch('http://localhost:8080/api/products')
+            .then(response => response.json())
+            .then(products => {
+                productSelect.innerHTML = ''; // Clear existing options
+                products.forEach(product => {
+                    const option = document.createElement('option');
+                    option.value = product.id;
+                    option.textContent = product.title;
+                    productSelect.appendChild(option);
+                });
+                //set initial product price
+                if(products.length > 0){
+                    selectedProductPrice = products[0].price;
+                    orderSummaryTotalElement.textContent = `₹${selectedProductPrice}`;
+                    orderSummaryProductElement.textContent = products[0].title;
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching products:', error);
+                orderStatus.textContent = 'Failed to load products. Please try again later.';
+            });
+
+        // Fetch mechanics and populate the mechanic dropdown
+        function fetchMechanics() {
+            fetch('http://localhost:8080/api/orders/nearby-mechanics')
+                .then(response => response.json())
+                .then(mechanics => {
+                    mechanicSelect.innerHTML = ''; // Clear existing options
+                    if (mechanics.length === 0) {
+                        mechanicSelectGroup.style.display = 'none';
+                        mechanicRequestCheckbox.checked = false;
+                        mechanicRequestCheckbox.disabled = true;
+                        orderSummaryMechanicElement.textContent = "No";
+                        orderStatus.textContent = 'No mechanics available in your area.';
+                        return;
+                    }
+
+                    mechanics.forEach(mechanic => {
+                        const option = document.createElement('option');
+                        option.value = mechanic.userId;
+                        option.textContent = mechanic.name;
+                        mechanicSelect.appendChild(option);
+                    });
+                    mechanicSelectGroup.style.display = 'block';
+                    mechanicRequestCheckbox.disabled = false;
+                    orderSummaryMechanicElement.textContent = "Yes";
+                })
+                .catch(error => {
+                    console.error('Error fetching mechanics:', error);
+                    orderStatus.textContent = 'Failed to load mechanics. Please try again later.';
+                });
+        }
+
+        // Event listener for mechanic request checkbox
+        mechanicRequestCheckbox.addEventListener('change', () => {
+            if (mechanicRequestCheckbox.checked) {
+                fetchMechanics(); // Fetch and show mechanics if checked
+            } else {
+                mechanicSelectGroup.style.display = 'none'; // Hide if unchecked
+                mechanicSelect.innerHTML = '';
+                orderSummaryMechanicElement.textContent = "No";
+            }
+        });
+
+         productSelect.addEventListener('change', () => {
+            const selectedProductId = productSelect.value;
+            fetch(`http://localhost:8080/api/products/${selectedProductId}`)
+                .then(response => response.json())
+                .then(product => {
+                    selectedProductPrice = product.price;
+                    orderSummaryTotalElement.textContent = `₹${selectedProductPrice}`;
+                    orderSummaryProductElement.textContent = product.title;
+                })
+                .catch(error => {
+                    console.error("Error fetching product details", error);
+                    orderStatus.textContent = "Failed to fetch product price";
+                })
+        });
+
+        // Initialize Stripe Payment Element
+        async function initializePayment() {
+            const response = await fetch('http://localhost:8080/api/payment/create-payment-intent', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ amount: selectedProductPrice * 100 }), // Amount in cents
+            }).then(res => res.json());
+
+            const { clientSecret } = response;
+
+            elements = stripe.elements({ clientSecret });
+            const paymentElement = elements.create('payment');
+            paymentElement.mount('#payment-element');
+        }
+        initializePayment();
+
+        // Handle form submission
+        orderForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            submitButton.disabled = true;
+            orderStatus.textContent = 'Processing your order...';
+
+            const productId = productSelect.value;
+            const mechanicRequested = mechanicRequestCheckbox.checked;
+            const mechanicId = mechanicRequested ? mechanicSelect.value : null;
+
+            if (!elements) {
+                orderStatus.textContent = "Please enter your payment information";
+                submitButton.disabled = false;
+                return;
+            }
+           const { error: stripeError, paymentIntent } = await stripe.confirmPayment({
+                elements,
+                confirmParams: {
+                    // Make sure to include the return_url in your app's pages.
+                    return_url: 'http://localhost:3000/order-status.html', // Replace with your actual return URL
+                },
+            });
+
+            if (stripeError) {
+                orderStatus.textContent = `Payment failed: ${stripeError.message}`;
+                submitButton.disabled = false;
+                return;
+            }
+            console.log("payment intent", paymentIntent);
+
+            // Send order details to your backend
+            fetch('http://localhost:8080/api/orders/place', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    productId,
+                    mechanicRequested,
+                    mechanicId,
+                    paymentIntentId: paymentIntent.id
+                }),
+            })
+            .then(response => response.text())
+            .then(orderResponse => {
+                orderStatus.textContent = orderResponse;
+                if(orderResponse === "Order placed successfully"){
+                    //redirect to order status page
+                     window.location.href = `/order-status.html?orderId=${paymentIntent.id}`;
+                }
+                submitButton.disabled = false;
+            })
+            .catch(error => {
+                orderStatus.textContent = `Error placing order: ${error.message}`;
+                submitButton.disabled = false;
+                console.error("order error", error);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Product Details - Car Part Marketplace</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://unpkg.com/swiper@8/swiper-bundle.min.css"/>
+    <script src="https://unpkg.com/swiper@8/swiper-bundle.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .product-detail {
+            background: white;
+            border-radius: 0.75rem;
+            padding: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .carousel {
+            margin-bottom: 1rem;
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+        .carousel-images {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            width: 100%;
+        }
+        .carousel-images img {
+            width: 100%;
+            max-height: 300px;
+            object-fit: cover;
+            scroll-snap-align: start;
+            flex-shrink: 0;
+        }
+        .product-detail h1 {
+            margin-bottom: 1.5rem;
+            font-size: 2.25rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        .product-detail h3 {
+            margin: 1.25rem 0;
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: #334155;
+        }
+        .product-detail p {
+            margin: 0.5rem 0;
+            font-size: 1rem;
+            color: #4b5563;
+        }
+        .seller-info {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e5e7eb;
+        }
+        .buy-button {
+            @apply bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2.5 px-6 rounded-md shadow-md transition-colors duration-200 ease-in-out mt-6 w-full text-center;
+            font-size: 1.125rem;
+        }
+        .swiper {
+            width: 100%;
+            height: 300px;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+        .swiper-slide {
+            text-align: center;
+            font-size: 18px;
+            background: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .swiper-slide img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .swiper-pagination-bullet-active {
+            background-color: #3b82f6; /* Tailwind's blue-500 */
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="container">
+        <div class="product-detail" id="productDetail">
+            </div>
+    </div>
+    <script>
+        // Get the product ID from the URL query string
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = urlParams.get('id');
+
+        async function fetchProductDetails() {
+    const user = JSON.parse(localStorage.getItem('user')); // Retrieve user info from localStorage
+
+    if (!user || !user.token) {
+        alert("Please log in to view product details.");
+        return;
+    }
+
+    try {
+        const response = await fetch(`http://localhost:8080/api/products/${productId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${user.token}`, // Include the Bearer token in the headers
+            }
+        });
+
+        const product = await response.json();
+
+        const productDetail = document.getElementById("productDetail");
+
+        let imagesHTML = '';
+        if (product.imageNames && product.imageNames.length > 1) {
+            // Use Swiper carousel for multiple images
+            imagesHTML = `<div class="swiper">
+                            <div class="swiper-wrapper">`;
+            product.imageNames.forEach(imageName => {
+                imagesHTML += `<div class="swiper-slide">
+                                <img src="http://localhost:8080/uploads/${imageName}" alt="${product.title} image" />
+                              </div>`;
+            });
+            imagesHTML += `</div>
+                            <div class="swiper-pagination"></div>
+                        </div>`;
+        } else if (product.imageNames && product.imageNames.length === 1) {
+            // Display single image
+            imagesHTML = `<div class="carousel">
+                            <div class="carousel-images">
+                                <img src="http://localhost:8080/uploads/${product.imageNames[0]}" alt="${product.title} image" />
+                            </div>
+                          </div>`;
+        } else {
+            // Display placeholder
+            imagesHTML = `<div class="carousel">
+                            <div class="carousel-images">
+                                <img src="https://via.placeholder.com/150" alt="${product.title} image" />
+                            </div>
+                          </div>`;
+        }
+
+        productDetail.innerHTML = `
+            <h1>${product.title}</h1>
+            ${imagesHTML}
+            <h3>Price: ₹${product.price}</h3>
+            <p><strong>Category:</strong> ${product.category}</p>
+            <p><strong>Description:</strong> ${product.description}</p>
+            <div class="seller-info">
+                <p><strong>Seller:</strong> ${product.seller.name}</p>
+                <p><strong>Location:</strong> ${product.seller.address} (${product.seller.pinCode})</p>
+            </div>
+            <button class="buy-button" id="buy-button">Buy Now</button>
+        `;
+
+        // Initialize Swiper if multiple images
+        if (product.imageNames && product.imageNames.length > 1) {
+            const swiper = new Swiper(productDetail.querySelector('.swiper'), {
+                direction: 'horizontal',
+                loop: true,
+                pagination: {
+                    el: '.swiper-pagination',
+                },
+            });
+        }
+
+        // Add event listener to the Buy Now button
+        const buyButton = document.getElementById('buy-button');
+        buyButton.addEventListener('click', () => {
+            // Redirect to checkout page with product ID
+            window.location.href = `/checkout.html?productId=${product.id}`;
+        });
+
+    } catch (error) {
+        console.error("Failed to load product details:", error);
+        const productDetail = document.getElementById("productDetail");
+        productDetail.innerHTML = `<p class="text-red-500">Failed to load product details: ${error.message}</p>`;
+    }
+}
+
+
+        fetchProductDetails();
+    </script>
+</body>
+</html>

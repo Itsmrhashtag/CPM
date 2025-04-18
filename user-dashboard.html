@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard - CarPartMarketplace</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .card {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .dashboard-card {
+            @apply bg-white rounded-lg shadow-md p-6 transition-transform transform hover:scale-105;
+        }
+        .dashboard-card-title {
+            @apply text-xl font-semibold text-gray-800 mb-4;
+        }
+        .dashboard-card-content {
+            @apply text-gray-700;
+        }
+        .btn-primary {
+            @apply bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded;
+        }
+        .grid-cols-2 {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <header class="bg-gray-800 text-white py-4">
+        <div class="container mx-auto px-4 text-center">
+            <h1 class="text-3xl font-semibold">User Dashboard</h1>
+        </div>
+    </header>
+    <main class="container mx-auto px-4 py-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="dashboard-card">
+                <h2 class="dashboard-card-title">My Products</h2>
+                <p class="dashboard-card-content">Manage your listed products.</p>
+                <a href="/my-products.html" class="btn-primary mt-4">View Products</a>
+            </div>
+            <div class="dashboard-card">
+                <h2 class="dashboard-card-title">All Products</h2>
+                <p class="dashboard-card-content">View all products in the marketplace.</p>
+                <a href="/all-products.html" class="btn-primary mt-4">View All</a>
+            </div>
+            <div class="dashboard-card">
+                <h2 class="dashboard-card-title">Booked Mechanic</h2>
+                <p class="dashboard-card-content">View your booked mechanics.</p>
+                <a href="/booked-mechanic.html" class="btn-primary mt-4">View Bookings</a>
+            </div>
+            <div class="dashboard-card">
+                <h2 class="dashboard-card-title">My Orders</h2>
+                <p class="dashboard-card-content">View all products in the marketplace.</p>
+                <a href="/my-orders.html" class="btn-primary mt-4">View All</a>
+            </div>
+  
+            <div class="dashboard-card">
+                <h2 class="dashboard-card-title">My Profile</h2>
+                <p class="dashboard-card-content">Manage your profile information.</p>
+                <a href="/my-profile.html" class="btn-primary mt-4">View Profile</a>
+            </div>
+        </div>
+    </main>
+    <script>
+        const user = localStorage.getItem('user');
+        if (!user) {
+            window.location.href = '/login.html';
+        } else {
+            const userData = JSON.parse(user);
+            if (userData.user.role !== 'USER') {
+                alert('Access denied.  Redirecting to login.');
+                window.location.href = '/login.html';
+            }
+        }
+    </script>
+</body>
+</html>
