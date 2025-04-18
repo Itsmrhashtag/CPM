@@ -1,74 +1,108 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mechanic's Bookings</title>
-    <link href="https://cdn.tailwindcss.com" rel="stylesheet">
-    <script>
-        // Fetch mechanic's orders from the API
-        async function fetchOrders() {
-            const user = JSON.parse(localStorage.getItem("user"));
-            if (!user || user.user.role !== "MECHANIC" || !user.token) {
-                alert('You are not a mechanic or not authenticated. Redirecting to login.');
-                window.location.href = '/login.html';  // Redirect to the login page
-                return;
-            }
-
-            const mechanicUserId = user.user.userId;  // Get the mechanic's user ID from the logged-in user
-            const token = user.token;  // Retrieve the JWT token
-
-            try {
-                // Construct the API URL dynamically
-                const apiUrl = `http://localhost:8080/api/orders/mechanic/${mechanicUserId}`;
-                
-                // Fetch orders for the mechanic
-                const response = await fetch(apiUrl, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,  // Include the token in the Authorization header
-                    },
-                });
-
-                if (!response.ok) {
-                    throw new Error('Failed to fetch orders.');
-                }
-
-                const orders = await response.json();
-
-                // Display the orders on the page
-                const ordersContainer = document.getElementById('orders-container');
-                orders.forEach(order => {
-                    const orderElement = document.createElement('div');
-                    orderElement.classList.add('p-4', 'bg-white', 'shadow-md', 'mb-4');
-                    orderElement.innerHTML = `
-                        <h3 class="font-semibold">Order ID: ${order.id}</h3>
-                        <p><strong>Buyer:</strong> ${order.buyer.name}</p>
-                        <p><strong>Product:</strong> ${order.product.title}</p>
-                        <p><strong>Order Time:</strong> ${new Date(order.orderTime).toLocaleString()}</p>
-                        <p><strong>Mechanic Requested:</strong> ${order.mechanicRequested ? 'Yes' : 'No'}</p>
-                        <p><strong>Status:</strong> ${order.isPaid ? 'Paid' : 'Unpaid'}</p>
-                    `;
-                    ordersContainer.appendChild(orderElement);
-                });
-            } catch (error) {
-                alert('Error fetching orders: ' + error.message);
-            }
-        }
-
-        // Call the fetchOrders function when the page loads
-        window.onload = fetchOrders;
-    </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mechanic's Bookings - CarPartMarketplace</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://unpkg.com/swiper@8/swiper-bundle.min.css"/>
+  <script src="https://unpkg.com/swiper@8/swiper-bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
 </head>
 <body class="bg-gray-100">
-    <header class="bg-gray-800 text-white py-4">
-        <div class="container mx-auto text-center">
-            <h1 class="text-3xl">Mechanic's Orders</h1>
-        </div>
-    </header>
-
-    <div class="container mx-auto p-6">
-        <div id="orders-container" class="space-y-4"></div>
+  <!-- Header -->
+  <header class="bg-gradient-to-r from-blue-700 to-blue-500 text-white shadow-md">
+    <div class="max-w-7xl mx-auto px-6 py-5">
+      <h1 class="text-3xl font-bold text-center">🛠️ Mechanic's Bookings</h1>
     </div>
+  </header>
+
+  <!-- Main Section -->
+  <main class="max-w-7xl mx-auto px-6 py-10">
+    <!-- Orders Section -->
+    <div id="orders-container" class="grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+      <div class="text-center col-span-full">
+        <p class="text-gray-500 text-lg">Loading bookings...</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- JS Section -->
+  <script>
+    async function fetchOrders() {
+      const user = JSON.parse(localStorage.getItem("user"));
+      if (!user || user.user.role !== "MECHANIC" || !user.token) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Access Denied',
+          text: 'You are not a mechanic or not authenticated. Please log in.',
+        }).then(() => {
+          window.location.href = '/login.html';
+        });
+        return;
+      }
+
+      const mechanicUserId = user.user.userId;
+      const token = user.token;
+
+      try {
+        const response = await fetch(`http://localhost:8080/api/orders/mechanic/${mechanicUserId}`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch bookings');
+        }
+
+        const orders = await response.json();
+        const ordersContainer = document.getElementById('orders-container');
+        ordersContainer.innerHTML = '';
+
+        if (!orders.length) {
+          ordersContainer.innerHTML = `<div class="text-center col-span-full"><p class="text-gray-500 text-lg">No bookings assigned yet.</p></div>`;
+          return;
+        }
+
+        orders.forEach(order => {
+          const orderElement = document.createElement('div');
+          orderElement.className = 'bg-white rounded-xl shadow-lg p-5 transition-transform hover:-translate-y-1 hover:shadow-xl duration-300';
+          orderElement.innerHTML = `
+            <h3 class="text-xl font-semibold text-gray-800 mb-2">Order ID: ${order.id}</h3>
+            <p class="text-gray-600 mb-2"><strong>Buyer:</strong> ${order.buyer?.name || 'N/A'}</p>
+            <p class="text-gray-600 mb-2"><strong>Product:</strong> ${order.product?.title || 'N/A'}</p>
+            <p class="text-gray-600 mb-2"><strong>Order Time:</strong> ${order.orderTime ? new Date(order.orderTime).toLocaleString() : 'N/A'}</p>
+            <p class="text-gray-600 mb-2"><strong>Mechanic Requested:</strong> ${order.mechanicRequested ? 'Yes' : 'No'}</p>
+            <p class="text-gray-600"><strong>Status:</strong> 
+              <span class="${order.isPaid ? 'text-green-600' : 'text-red-600'} font-semibold">
+                ${order.isPaid ? 'Paid' : 'Unpaid'}
+              </span>
+            </p>
+          `;
+          ordersContainer.appendChild(orderElement);
+        });
+      } catch (error) {
+        console.error('Error fetching bookings:', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: 'Failed to load bookings. Please try again later.',
+        });
+        document.getElementById('orders-container').innerHTML = `
+          <div class="text-center col-span-full text-red-500">${error.message}</div>
+        `;
+      }
+    }
+
+    window.onload = fetchOrders;
+  </script>
 </body>
 </html>

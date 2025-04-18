@@ -1,202 +1,311 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>My Profile - Car Part Marketplace</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Profile - CarPartMarketplace</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet"/>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://unpkg.com/swiper@8/swiper-bundle.min.css"/>
+  <script src="https://unpkg.com/swiper@8/swiper-bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      max-width: 800px;
-      margin: auto;
-      padding: 20px;
-    }
-    .section {
-      border: 1px solid #ccc;
-      padding: 16px;
-      border-radius: 6px;
-      margin-bottom: 20px;
-    }
-    .input-field {
-      margin-bottom: 10px;
-      padding: 10px;
-      width: 100%;
-      border-radius: 4px;
-      border: 1px solid #ccc;
-    }
-    .button {
-      background-color: #28a745;
-      color: white;
-      padding: 10px 20px;
-      border-radius: 4px;
-      border: none;
-      cursor: pointer;
-    }
-    .button:disabled {
-      background-color: #888;
+      font-family: 'Inter', sans-serif;
     }
   </style>
 </head>
-<body>
-
-<h2>My Profile</h2>
-
-<div id="user-profile" class="section">
-  <!-- Profile information will be loaded here -->
-  <p id="loading">Loading profile...</p>
-</div>
-
-<div id="edit-profile" class="section" style="display: none;">
-  <h3>Edit Profile</h3>
-  <form id="edit-form">
-    <div>
-      <label for="name">Name</label>
-      <input type="text" id="name" class="input-field">
+<body class="bg-gray-100">
+  <!-- Header -->
+  <header class="bg-gradient-to-r from-blue-700 to-blue-500 text-white shadow-md">
+    <div class="max-w-7xl mx-auto px-6 py-5">
+      <h1 class="text-3xl font-bold text-center">👤 My Profile</h1>
     </div>
-    <div>
-      <label for="email">Email</label>
-      <input type="email" id="email" class="input-field">
+  </header>
+
+  <!-- Main Section -->
+  <main class="max-w-7xl mx-auto px-6 py-10">
+    <!-- Profile Section -->
+    <div id="user-profile" class="bg-white rounded-xl shadow-lg p-6 mb-6">
+      <p id="loading" class="text-gray-500 text-lg">Loading profile...</p>
     </div>
-    <div>
-      <label for="phone">Phone</label>
-      <input type="text" id="phone" class="input-field">
+
+    <!-- Edit Profile Section -->
+    <div id="edit-profile" class="bg-white rounded-xl shadow-lg p-6 mb-6 hidden">
+      <h3 class="text-xl font-semibold text-gray-800 mb-4">Edit Profile</h3>
+      <form id="edit-form">
+        <div class="grid md:grid-cols-2 gap-4">
+          <div>
+            <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+            <input type="text" id="name" class="w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Enter your name" />
+          </div>
+          <div>
+            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <input type="email" id="email" class="w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Enter your email" />
+          </div>
+          <div>
+            <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+            <input type="text" id="phone" class="w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Enter your phone number" />
+          </div>
+          <div>
+            <label for="address" class="block text-sm font-medium text-gray-700 mb-1">Address</label>
+            <input type="text" id="address" class="w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Enter your address" />
+          </div>
+          <div>
+            <label for="pinCode" class="block text-sm font-medium text-gray-700 mb-1">Pin Code</label>
+            <input type="text" id="pinCode" class="w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Enter your pin code" />
+          </div>
+        </div>
+        <div class="flex space-x-4 mt-4">
+          <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-md shadow-md transition duration-200">Save Changes</button>
+          <button type="button" onclick="hideEditForm()" class="bg-gray-500 hover:bg-gray-600 text-white font-semibold px-6 py-3 rounded-md shadow-md transition duration-200">Cancel</button>
+        </div>
+      </form>
     </div>
-    <div>
-      <label for="address">Address</label>
-      <input type="text" id="address" class="input-field">
+
+    <!-- Change Password Section -->
+    <div id="change-password" class="bg-white rounded-xl shadow-lg p-6 mb-6 hidden">
+      <h3 class="text-xl font-semibold text-gray-800 mb-4">Change Password</h3>
+      <form id="password-form">
+        <div class="grid md:grid-cols-2 gap-4">
+          <div>
+            <label for="newPassword" class="block text-sm font-medium text-gray-700 mb-1">New Password</label>
+            <input type="password" id="newPassword" class="w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Enter new password" required />
+          </div>
+          <div>
+            <label for="confirmPassword" class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+            <input type="password" id="confirmPassword" class="w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Confirm new password" required />
+          </div>
+        </div>
+        <div class="flex space-x-4 mt-4">
+          <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-md shadow-md transition duration-200">Update Password</button>
+          <button type="button" onclick="hidePasswordForm()" class="bg-gray-500 hover:bg-gray-600 text-white font-semibold px-6 py-3 rounded-md shadow-md transition duration-200">Cancel</button>
+        </div>
+      </form>
     </div>
-    <div>
-      <label for="pinCode">Pin Code</label>
-      <input type="text" id="pinCode" class="input-field">
+
+    <!-- Action Buttons -->
+    <div class="flex space-x-4">
+      <button id="edit-button" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-md shadow-md transition duration-200">Edit Profile</button>
+      <button id="password-button" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-md shadow-md transition duration-200">Change Password</button>
+      <button id="cancel-button" class="bg-gray-500 hover:bg-gray-600 text-white font-semibold px-6 py-3 rounded-md shadow-md transition duration-200 hidden">Cancel</button>
     </div>
-    <button type="submit" class="button">Save Changes</button>
-  </form>
-</div>
+  </main>
 
-<div>
-  <button id="edit-button" class="button">Edit Profile</button>
-  <button id="cancel-button" class="button" style="display: none;">Cancel</button>
-</div>
+  <!-- JS Section -->
+  <script>
+    const userData = JSON.parse(localStorage.getItem('user'));
+    const userId = userData?.user?.userId;
+    const token = userData?.token;
 
-<script>
-// Get userId from localStorage
-// Get user data from localStorage
-const userData = JSON.parse(localStorage.getItem('user'));
-const userId = userData?.user?.userId;
-const token = userData?.token; // Assuming token is stored here
+    const userProfileDiv = document.getElementById('user-profile');
+    const editProfileDiv = document.getElementById('edit-profile');
+    const changePasswordDiv = document.getElementById('change-password');
+    const editButton = document.getElementById('edit-button');
+    const passwordButton = document.getElementById('password-button');
+    const cancelButton = document.getElementById('cancel-button');
 
-const userProfileDiv = document.getElementById('user-profile');
-const editProfileDiv = document.getElementById('edit-profile');
-const loadingDiv = document.getElementById('loading');
-const editButton = document.getElementById('edit-button');
-const cancelButton = document.getElementById('cancel-button');
-
-if (!userId) {
-  userProfileDiv.innerHTML = "<p class='text-red-500'>User not found. Please log in.</p>";
-}
-
-// Fetch user data with authentication
-async function fetchUserProfile() {
-  try {
-    const response = await fetch(`http://localhost:8080/api/users/${userId}`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`, // Add the token in the Authorization header
-      },
-    });
-
-    const user = await response.json();
-    
-    if (response.ok) {
-      userProfileDiv.innerHTML = `
-        <h3>Profile Information</h3>
-        <p><strong>Name:</strong> ${user.name}</p>
-        <p><strong>Email:</strong> ${user.email}</p>
-        <p><strong>Phone:</strong> ${user.phone}</p>
-        <p><strong>Address:</strong> ${user.address}</p>
-        <p><strong>Pin Code:</strong> ${user.pinCode}</p>
-      `;
+    if (!userId || !token) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Not Authenticated',
+        text: 'Please log in to view your profile.',
+      }).then(() => {
+        window.location.href = '/login.html';
+      });
     } else {
-      userProfileDiv.innerHTML = `<p class='text-red-500'>Failed to load profile.</p>`;
-    }
-  } catch (error) {
-    console.error('Error fetching user profile:', error);
-    userProfileDiv.innerHTML = `<p class='text-red-500'>Error fetching profile.</p>`;
-  }
-}
+      // Fetch user data with authentication
+      async function fetchUserProfile() {
+        try {
+          const response = await fetch(`http://localhost:8080/api/users/${userId}`, {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            },
+          });
 
-// Display the edit form
-function showEditForm() {
-  editProfileDiv.style.display = 'block';
-  editButton.style.display = 'none';
-  cancelButton.style.display = 'inline-block';
-  
-  // Prefill the edit form with user data
-  document.getElementById('name').value = userData.user.name;
-  document.getElementById('email').value = userData.user.email;
-  document.getElementById('phone').value = userData.user.phone;
-  document.getElementById('address').value = userData.user.address;
-  document.getElementById('pinCode').value = userData.user.pinCode;
-}
+          if (!response.ok) {
+            throw new Error('Failed to fetch profile');
+          }
 
-// Hide the edit form
-function hideEditForm() {
-  editProfileDiv.style.display = 'none';
-  editButton.style.display = 'inline-block';
-  cancelButton.style.display = 'none';
-}
+          const user = await response.json();
 
-// Handle profile edit submission
-async function handleEditForm(event) {
-  event.preventDefault();
-  
-  const updatedUser = {
-    name: document.getElementById('name').value,
-    email: document.getElementById('email').value,
-    phone: document.getElementById('phone').value,
-    address: document.getElementById('address').value,
-    pinCode: document.getElementById('pinCode').value,
-  };
-  
-  try {
-    const response = await fetch(`http://localhost:8080/api/users/${userId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`, // Add token in Authorization header
-      },
-      body: JSON.stringify(updatedUser),
-    });
+          userProfileDiv.innerHTML = `
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">Profile Information</h3>
+            <p class="text-gray-600 mb-2"><strong>Name:</strong> ${user.name || 'N/A'}</p>
+            <p class="text-gray-600 mb-2"><strong>Email:</strong> ${user.email || 'N/A'}</p>
+            <p class="text-gray-600 mb-2"><strong>Phone:</strong> ${user.phone || 'N/A'}</p>
+            <p class="text-gray-600 mb-2"><strong>Address:</strong> ${user.address || 'N/A'}</p>
+            <p class="text-gray-600 mb-2"><strong>Pin Code:</strong> ${user.pinCode || 'N/A'}</p>
+          `;
+        } catch (error) {
+          console.error('Error fetching user profile:', error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Failed to load profile. Please try again later.',
+          });
+          userProfileDiv.innerHTML = `<p class="text-red-500 text-center">Error fetching profile: ${error.message}</p>`;
+        }
+      }
 
-    const updatedUserData = await response.json();
-    
-    if (response.ok) {
-      // Update the localStorage data and reload profile
-      userData.user = updatedUserData;
-      localStorage.setItem('user', JSON.stringify(userData));
-      
-      // Reload profile
+      // Display the edit form
+      function showEditForm() {
+        editProfileDiv.classList.remove('hidden');
+        changePasswordDiv.classList.add('hidden');
+        editButton.classList.add('hidden');
+        passwordButton.classList.add('hidden');
+        cancelButton.classList.remove('hidden');
+
+        // Prefill the edit form with user data
+        document.getElementById('name').value = userData.user.name || '';
+        document.getElementById('email').value = userData.user.email || '';
+        document.getElementById('phone').value = userData.user.phone || '';
+        document.getElementById('address').value = userData.user.address || '';
+        document.getElementById('pinCode').value = userData.user.pinCode || '';
+      }
+
+      // Display the password form
+      function showPasswordForm() {
+        changePasswordDiv.classList.remove('hidden');
+        editProfileDiv.classList.add('hidden');
+        editButton.classList.add('hidden');
+        passwordButton.classList.add('hidden');
+        cancelButton.classList.remove('hidden');
+
+        // Clear password fields
+        document.getElementById('newPassword').value = '';
+        document.getElementById('confirmPassword').value = '';
+      }
+
+      // Hide the edit form
+      function hideEditForm() {
+        editProfileDiv.classList.add('hidden');
+        editButton.classList.remove('hidden');
+        passwordButton.classList.remove('hidden');
+        cancelButton.classList.add('hidden');
+      }
+
+      // Hide the password form
+      function hidePasswordForm() {
+        changePasswordDiv.classList.add('hidden');
+        editButton.classList.remove('hidden');
+        passwordButton.classList.remove('hidden');
+        cancelButton.classList.add('hidden');
+      }
+
+      // Handle profile edit submission
+      async function handleEditForm(event) {
+        event.preventDefault();
+
+        const updatedUser = {
+          name: document.getElementById('name').value,
+          email: document.getElementById('email').value,
+          phone: document.getElementById('phone').value,
+          address: document.getElementById('address').value,
+          pinCode: document.getElementById('pinCode').value,
+        };
+
+        try {
+          const response = await fetch(`http://localhost:8080/api/users/${userId}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify(updatedUser),
+          });
+
+          if (!response.ok) {
+            throw new Error('Failed to update profile');
+          }
+
+          const updatedUserData = await response.json();
+
+          // Update the localStorage data and reload profile
+          userData.user = updatedUserData;
+          localStorage.setItem('user', JSON.stringify(userData));
+
+          Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: 'Profile updated successfully!',
+          });
+
+          // Reload profile
+          fetchUserProfile();
+          hideEditForm();
+        } catch (error) {
+          console.error('Error updating user profile:', error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Failed to update profile. Please try again.',
+          });
+        }
+      }
+
+      // Handle password change submission
+      async function handlePasswordForm(event) {
+        event.preventDefault();
+
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+
+        if (newPassword !== confirmPassword) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Invalid Input',
+            text: 'Passwords do not match.',
+          });
+          return;
+        }
+
+        try {
+          const response = await fetch(`http://localhost:8080/api/users/${userId}/password`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify({ password: newPassword }),
+          });
+
+          if (!response.ok) {
+            throw new Error('Failed to update password');
+          }
+
+          Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: 'Password updated successfully! Please log in again.',
+          }).then(() => {
+            localStorage.removeItem('user');
+            window.location.href = '/login.html';
+          });
+        } catch (error) {
+          console.error('Error updating password:', error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Failed to update password. Please try again.',
+          });
+        }
+      }
+
+      // Event Listeners
+      editButton.addEventListener('click', showEditForm);
+      passwordButton.addEventListener('click', showPasswordForm);
+      cancelButton.addEventListener('click', () => {
+        hideEditForm();
+        hidePasswordForm();
+      });
+      document.getElementById('edit-form').addEventListener('submit', handleEditForm);
+      document.getElementById('password-form').addEventListener('submit', handlePasswordForm);
+
+      // Fetch user profile when the page loads
       fetchUserProfile();
-      
-      hideEditForm();
-    } else {
-      alert('Failed to update profile.');
     }
-  } catch (error) {
-    console.error('Error updating user profile:', error);
-    alert('Error updating profile.');
-  }
-}
-
-// Event Listeners
-editButton.addEventListener('click', showEditForm);
-cancelButton.addEventListener('click', hideEditForm);
-document.getElementById('edit-form').addEventListener('submit', handleEditForm);
-
-// Fetch user profile when the page loads
-fetchUserProfile();
-
-</script>
-
+  </script>
 </body>
 </html>

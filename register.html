@@ -1,159 +1,118 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - CarPartMarketplace</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-      body {
-        font-family: 'Inter', sans-serif;
-      }
-      .card {
-        background-color: rgba(255, 255, 255, 0.9);
-        border-radius: 0.75rem;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-      }
-      .form-input {
-        border-radius: 0.375rem;
-        padding: 0.75rem;
-        border: 1px solid #e2e8f0;
-        width: 100%;
-        outline: none;
-        font-size: 1rem;
-        transition: border-color 0.15s ease-in-out, shadow-sm 0.15s ease-in-out;
-      }
-      .form-input:focus {
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
-      }
-      .form-label {
-        margin-bottom: 0.5rem;
-        display: block;
-        font-weight: 500;
-        color: #4a5568;
-        font-size: 0.875rem;
-      }
-      .btn-primary {
-        background-color: #3b82f6;
-        color: white;
-        padding: 0.75rem 1.5rem;
-        border-radius: 0.375rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: background-color 0.15s ease-in-out, transform 0.1s ease-in-out, shadow-sm 0.15s ease-in-out;
-        width: 100%;
-        display: block;
-        text-align: center;
-      }
-      .btn-primary:hover {
-        background-color: #2563eb;
-        transform: translateY(-1px);
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
-      }
-      .btn-primary:active {
-        background-color: #1e40af;
-        transform: translateY(0);
-        box-shadow: none;
-      }
-      .select-input {
-        appearance: none;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        background-image: url("data:image/svg+xml,%3Csvgxmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath fill='currentColor' d='M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z'/%3E%3C/svg%3E");
-        background-repeat: no-repeat;
-        background-position: right 0.75rem center;
-        background-size: 1rem;
-        padding-right: 2.5rem;
-      }
-      .select-input:focus {
-         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%233b82f6'%3E%3Cpath d='M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z'/%3E%3C/svg%3E");
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
-        border-color: #3b82f6;
-      }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register - Car Part Marketplace</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
 </head>
-<body class="bg-cover bg-center bg-no-repeat" style="background-image: url('https://images.unsplash.com/photo-1492144543567-39555e115fc3?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');">
-    <header class="bg-gray-800 text-white py-4">
-        <div class="container mx-auto px-4 text-center">
-            <h1 class="text-3xl font-semibold">CarPartMarketplace</h1>
-        </div>
-    </header>
-    <div class="min-h-screen flex items-center justify-center py-10">
-        <div class="card w-full max-w-md p-8">
-            <h1 class="text-2xl font-semibold mb-6 text-gray-800 text-center">Register</h1>
-            <form id="registerForm" action="http://localhost:8080/api/auth/register" method="POST" class="space-y-6">
-                <div>
-                    <label for="name" class="form-label">Name</label>
-                    <input type="text" id="name" name="name" class="form-input" placeholder="Your Name" required>
-                </div>
-                <div>
-                    <label for="email" class="form-label">Email</label>
-                    <input type="email" id="email" name="email" class="form-input" placeholder="youremail@example.com" required>
-                </div>
-                <div>
-                    <label for="password" class="form-label">Password</label>
-                    <input type="password" id="password" name="password" class="form-input" placeholder="Password" required>
-                </div>
-                <div>
-                    <label for="role" class="form-label">Role</label>
-                    <select id="role" name="role" class="form-input select-input" required>
-                        <option value="USER">User</option>
-                        <option value="ADMIN">Admin</option>
-                        <option value="MECHANIC">Mechanic</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="phone" class="form-label">Phone</label>
-                    <input type="tel" id="phone" name="phone" class="form-input" placeholder="9876543210" required>
-                </div>
-                <div>
-                    <label for="address" class="form-label">Address</label>
-                    <input type="text" id="address" name="address" class="form-input" placeholder="Somewhere Lane, Delhi" required>
-                </div>
-                <div>
-                    <label for="pinCode" class="form-label">Pin Code</label>
-                    <input type="text" id="pinCode" name="pinCode" class="form-input" placeholder="110001" required>
-                </div>
-                <button type="submit" class="btn-primary">Register</button>
-            </form>
-            <div class="mt-4 text-center text-gray-600">
-                Already have an account? <a href="/login.html" class="text-blue-500 hover:underline">Login</a>
-            </div>
-        </div>
+<body class="bg-cover bg-center bg-no-repeat min-h-screen" style="background-image: url('https://images.pexels.com/photos/100654/pexels-photo-100654.jpeg?auto=compress&cs=tinysrgb&w=1200');">
+  <header class="bg-gray-900 bg-opacity-80 text-white py-4 shadow-md">
+    <div class="container mx-auto px-4 text-center">
+      <h1 class="text-3xl font-bold tracking-wide">CarPartMarketplace</h1>
     </div>
-    <script>
-        document.getElementById('registerForm').addEventListener('submit', function(event) {
-            event.preventDefault();
+  </header>
 
-            const formData = new FormData(this);
-            const data = {};
-            formData.forEach((value, key) => {
-                data[key] = value;
-            });
+  <main class="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="w-full max-w-md space-y-8 bg-white bg-opacity-90 rounded-xl shadow-lg p-8 backdrop-blur">
+      <div>
+        <h2 class="text-center text-3xl font-extrabold text-gray-800">Create your account</h2>
+      </div>
+      <form id="registerForm" method="POST" class="space-y-6">
+        <div>
+          <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
+          <input type="text" id="name" name="name" required placeholder="Your Name"
+                 class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+        </div>
 
-            fetch('http://localhost:8080/api/auth/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => {
-                if (!response.ok) {
-                    return response.text().then(text => { throw new Error(text || 'Registration failed'); });
-                }
-                return response.text();
-            })
-            .then(responseText => {
-                alert(responseText || 'User registered successfully!');
-                window.location.href = '/login.html';
-            })
-            .catch(error => {
-                alert(error.message || 'An error occurred during registration.');
-            });
-        });
-    </script>
+        <div>
+          <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+          <input type="email" id="email" name="email" required placeholder="you@example.com"
+                 class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+        </div>
+
+        <div>
+          <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+          <input type="password" id="password" name="password" required placeholder="Password"
+                 class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+        </div>
+
+        <div>
+          <label for="role" class="block text-sm font-medium text-gray-700">Role</label>
+          <select id="role" name="role" required
+                  class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            <option value="USER">User</option>
+            <option value="MECHANIC">Mechanic</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="phone" class="block text-sm font-medium text-gray-700">Phone</label>
+          <input type="tel" id="phone" name="phone" required placeholder="9876543210"
+                 class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+        </div>
+
+        <div>
+          <label for="address" class="block text-sm font-medium text-gray-700">Address</label>
+          <input type="text" id="address" name="address" required placeholder="Street, City"
+                 class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+        </div>
+
+        <div>
+          <label for="pinCode" class="block text-sm font-medium text-gray-700">Pin Code</label>
+          <input type="text" id="pinCode" name="pinCode" required placeholder="110001"
+                 class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+        </div>
+
+        <button type="submit"
+                class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 font-semibold transition">
+          Register
+        </button>
+      </form>
+
+      <div class="text-center text-sm text-gray-600">
+        Already have an account? <a href="/login.html" class="text-blue-500 hover:underline font-medium">Login</a>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    document.getElementById('registerForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+
+      const formData = new FormData(this);
+      const data = {};
+      formData.forEach((value, key) => {
+        data[key] = value;
+      });
+
+      fetch('http://localhost:8080/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      })
+      .then(response => {
+        if (!response.ok) {
+          return response.text().then(text => { throw new Error(text || 'Registration failed'); });
+        }
+        return response.text();
+      })
+      .then(responseText => {
+        alert(responseText || 'User registered successfully!');
+        window.location.href = '/login.html';
+      })
+      .catch(error => {
+        alert(error.message || 'An error occurred during registration.');
+      });
+    });
+  </script>
 </body>
 </html>

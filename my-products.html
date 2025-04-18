@@ -1,372 +1,398 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Products - CarPartMarketplace</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://unpkg.com/swiper@8/swiper-bundle.min.css"/>
-    <script src="https://unpkg.com/swiper@8/swiper-bundle.min.js"></script>
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        .card {
-            background-color: rgba(255, 255, 255, 0.9);
-            border-radius: 0.75rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        }
-        .product-card {
-            @apply bg-white rounded-lg shadow-md p-4 transition-transform transform hover:scale-105;
-        }
-        .product-card-title {
-            @apply text-xl font-semibold text-gray-800 mb-2;
-        }
-        .product-card-description {
-            @apply text-gray-700 mb-2;
-        }
-        .product-card-price {
-            @apply text-gray-900 font-bold text-lg mb-2;
-        }
-        .product-card-image {
-            @apply rounded-md mb-4 w-full h-48 object-cover;
-        }
-        .btn-primary {
-            @apply bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded;
-        }
-        .grid-cols-3 {
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-        }
-
-        /* Swiper Styles */
-        .swiper {
-            width: 100%;
-            height: 300px;
-            border-radius: 0.5rem;
-            overflow: hidden;
-            margin-bottom: 1rem;
-        }
-
-        .swiper-slide {
-            text-align: center;
-            font-size: 18px;
-            background: #fff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .swiper-slide img {
-            display: block;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .swiper-pagination-bullet-active {
-            background-color: #3b82f6; /* Tailwind's blue-500 */
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Products - CarPartMarketplace</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://unpkg.com/swiper@8/swiper-bundle.min.css"/>
+  <script src="https://unpkg.com/swiper@8/swiper-bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
 </head>
 <body class="bg-gray-100">
-    <header class="bg-gray-800 text-white py-4">
-        <div class="container mx-auto px-4 text-center">
-            <h1 class="text-3xl font-semibold">My Products</h1>
-        </div>
-    </header>
-    <main class="container mx-auto px-4 py-8">
-        <div class="mb-6 flex justify-between items-center">
-            <h2 class="text-2xl font-semibold">Your Products</h2>
-            <button onclick="toggleForm()" class="btn-primary">+ Add Product</button>
-        </div>
-        
-        <!-- Product Form -->
-        <div id="product-form" class="bg-white p-6 rounded-lg shadow-md mb-6 hidden">
-            <h3 class="text-xl font-semibold mb-4">Add New Product</h3>
-            <form id="add-product-form" enctype="multipart/form-data">
-                <div class="mb-4">
-                    <label class="block font-medium mb-1">Title</label>
-                    <input type="text" name="title" class="w-full border px-3 py-2 rounded" required>
-                </div>
-                <div class="mb-4">
-                    <label class="block font-medium mb-1">Description</label>
-                    <textarea name="description" class="w-full border px-3 py-2 rounded" required></textarea>
-                </div>
-                <div class="mb-4">
-                    <label class="block font-medium mb-1">Price</label>
-                    <input type="number" name="price" class="w-full border px-3 py-2 rounded" required>
-                </div>
-                <div class="mb-4">
-                    <label class="block font-medium mb-1">Category</label>
-                    <input type="text" name="category" class="w-full border px-3 py-2 rounded" required>
-                </div>
-                <div class="mb-4">
-                    <label class="block font-medium mb-1">Upload Images</label>
-                    <input type="file" name="images" multiple class="w-full border px-3 py-2 rounded">
-                </div>
-                <button type="submit" class="btn-primary">Submit</button>
-            </form>
-            
-        </div>
-        <div id="update-form" class="bg-white p-6 rounded-lg shadow-md mb-6 hidden">
-            <h3 class="text-xl font-semibold mb-4">Update Product</h3>
-            <form id="update-product-form" enctype="multipart/form-data">
-                <input type="hidden" name="productId">
-                <div class="mb-4">
-                    <label class="block font-medium mb-1">Title</label>
-                    <input type="text" name="title" class="w-full border px-3 py-2 rounded" required>
-                </div>
-                <div class="mb-4">
-                    <label class="block font-medium mb-1">Description</label>
-                    <textarea name="description" class="w-full border px-3 py-2 rounded" required></textarea>
-                </div>
-                <div class="mb-4">
-                    <label class="block font-medium mb-1">Price</label>
-                    <input type="number" name="price" class="w-full border px-3 py-2 rounded" required>
-                </div>
-                <div class="mb-4">
-                    <label class="block font-medium mb-1">Category</label>
-                    <input type="text" name="category" class="w-full border px-3 py-2 rounded" required>
-                </div>
-                <div class="mb-4">
-                    <label class="block font-medium mb-1">Replace Images (optional)</label>
-                    <input type="file" name="images" multiple class="w-full border px-3 py-2 rounded">
-                </div>
-                <button type="submit" class="btn-primary bg-yellow-500 hover:bg-yellow-600">Update Product</button>
-            </form>
-        </div>
-        
-        
-        <div id="product-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div class="text-center">
-                <p class="text-gray-500">Loading products...</p>
+  <!-- Header -->
+  <header class="bg-gradient-to-r from-blue-700 to-blue-500 text-white shadow-md">
+    <div class="max-w-7xl mx-auto px-6 py-5">
+      <h1 class="text-3xl font-bold text-center">🚗 My Products</h1>
+    </div>
+  </header>
+
+  <!-- Main Section -->
+  <main class="max-w-7xl mx-auto px-6 py-10">
+    <!-- Add Product Button and Form -->
+    <div class="mb-8">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-800">Your Products</h2>
+        <button onclick="toggleForm('add')" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-md shadow-md transition duration-200">
+          + Add Product
+        </button>
+      </div>
+
+      <!-- Add Product Form -->
+      <div id="add-product-form-container" class="hidden bg-white p-6 rounded-xl shadow-lg mb-6">
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Add New Product</h3>
+        <form id="add-product-form" enctype="multipart/form-data">
+          <div class="grid md:grid-cols-2 gap-4">
+            <div>
+              <label class="block font-medium text-gray-700 mb-1">Title</label>
+              <input type="text" name="title" class="w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 outline-none" required />
             </div>
-        </div>
-    </main>
-    <script>
-        function toggleForm() {
-        const form = document.getElementById('product-form');
-        form.classList.toggle('hidden');
+            <div>
+              <label class="block font-medium text-gray-700 mb-1">Category</label>
+              <input type="text" name="category" class="w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 outline-none" required />
+            </div>
+            <div>
+              <label class="block font-medium text-gray-700 mb-1">Price</label>
+              <input type="number" name="price" step="0.01" class="w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 outline-none" required />
+            </div>
+            <div class="md:col-span-2">
+              <label class="block font-medium text-gray-700 mb-1">Description</label>
+              <textarea name="description" class="w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 outline-none" required></textarea>
+            </div>
+            <div class="md:col-span-2">
+              <label class="block font-medium text-gray-700 mb-1">Upload Images</label>
+              <input type="file" name="images" multiple class="w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 outline-none" accept="image/*" />
+            </div>
+          </div>
+          <div class="flex space-x-4 mt-4">
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-md shadow-md transition duration-200">
+              Submit
+            </button>
+            <button type="button" onclick="toggleForm('add')" class="bg-gray-500 hover:bg-gray-600 text-white font-semibold px-6 py-3 rounded-md shadow-md transition duration-200">
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Edit Product Form -->
+      <div id="edit-product-form-container" class="hidden bg-white p-6 rounded-xl shadow-lg mb-6">
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Edit Product</h3>
+        <form id="edit-product-form" enctype="multipart/form-data">
+          <input type="hidden" name="id" />
+          <div class="grid md:grid-cols-2 gap-4">
+            <div>
+              <label class="block font-medium text-gray-700 mb-1">Title</label>
+              <input type="text" name="title" class="w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 outline-none" required />
+            </div>
+            <div>
+              <label class="block font-medium text-gray-700 mb-1">Category</label>
+              <input type="text" name="category" class="w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 outline-none" required />
+            </div>
+            <div>
+              <label class="block font-medium text-gray-700 mb-1">Price</label>
+              <input type="number" name="price" step="0.01" class="w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 outline-none" required />
+            </div>
+            <div class="md:col-span-2">
+              <label class="block font-medium text-gray-700 mb-1">Description</label>
+              <textarea name="description" class="w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 outline-none" required></textarea>
+            </div>
+            <div class="md:col-span-2">
+              <label class="block font-medium text-gray-700 mb-1">Upload New Images (Optional)</label>
+              <input type="file" name="images" multiple class="w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 outline-none" accept="image/*" />
+            </div>
+          </div>
+          <div class="flex space-x-4 mt-4">
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-md shadow-md transition duration-200">
+              Save Changes
+            </button>
+            <button type="button" onclick="toggleForm('edit')" class="bg-gray-500 hover:bg-gray-600 text-white font-semibold px-6 py-3 rounded-md shadow-md transition duration-200">
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Product Grid -->
+    <div id="product-list" class="grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+      <div class="text-center col-span-full">
+        <p class="text-gray-500 text-lg">Loading products...</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- JS Section -->
+  <script>
+    function toggleForm(mode) {
+      const addFormContainer = document.getElementById('add-product-form-container');
+      const editFormContainer = document.getElementById('edit-product-form-container');
+      if (mode === 'add') {
+        addFormContainer.classList.toggle('hidden');
+        editFormContainer.classList.add('hidden');
+      } else if (mode === 'edit') {
+        editFormContainer.classList.toggle('hidden');
+        addFormContainer.classList.add('hidden');
+      }
     }
 
+    // Add Product
     const addForm = document.getElementById('add-product-form');
     addForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
+      e.preventDefault();
 
-        const user = JSON.parse(localStorage.getItem('user'));
-        if (!user || !user.token) {
-            return alert("Please login to add a product.");
-        }
-
-        const formData = new FormData(addForm);
-
-        try {
-            const res = await fetch("http://localhost:8080/api/products/add", {
-                method: "POST",
-                headers: {
-                    "Authorization": `Bearer ${user.token}`
-                },
-                body: formData
-            });
-
-            const text = await res.text();
-            alert(text);
-
-            // Refresh the product list
-            location.reload();
-        } catch (err) {
-            console.error(err);
-            alert("Error adding product");
-        }
-    });
-    function showUpdateForm(productId) {
-    const user = JSON.parse(localStorage.getItem('user'));
-    if (!user || !user.token) {
-        alert("Please login to update a product.");
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (!user || !user.token) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Not Authenticated',
+          text: 'Please log in to add a product.',
+        }).then(() => {
+          window.location.href = '/login.html';
+        });
         return;
-    }
+      }
 
-    fetch(`http://localhost:8080/api/products/${productId}`, {
-        method: "GET",
-        headers: {
+      const formData = new FormData(addForm);
+
+      try {
+        const res = await fetch("http://localhost:8080/api/products/add", {
+          method: "POST",
+          headers: {
             "Authorization": `Bearer ${user.token}`
-        }
-    })
-    .then(res => res.json())
-    .then(product => {
-        const form = document.getElementById('update-product-form');
-        form.productId.value = product.id;
-        form.title.value = product.title;
-        form.description.value = product.description;
-        form.price.value = product.price;
-        form.category.value = product.category;
-
-        document.getElementById('update-form').classList.remove('hidden');
-        window.scrollTo(0, document.getElementById('update-form').offsetTop);
-    })
-    .catch(err => {
-        console.error("Error fetching product for update:", err);
-        alert("Failed to fetch product details.");
-    });
-}
-
-document.getElementById('update-product-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const form = e.target;
-    const productId = form.productId.value;
-    const user = JSON.parse(localStorage.getItem('user'));
-    if (!user || !user.token) {
-        alert("Login required");
-        return;
-    }
-
-    const formData = new FormData(form);
-
-    try {
-        const res = await fetch(`http://localhost:8080/api/products/update/${productId}`, {
-            method: "PUT",
-            headers: {
-                "Authorization": `Bearer ${user.token}`
-            },
-            body: formData
+          },
+          body: formData
         });
 
-        if (!res.ok) throw new Error(await res.text());
-
-        alert("Product updated successfully");
-        location.reload();
-    } catch (err) {
-        console.error(err);
-        alert("Error updating product");
-    }
-});
-
-        const myHeaders = new Headers();
-        const user = localStorage.getItem('user');
-        if (user) {
-            const authToken = JSON.parse(user).token;
-            myHeaders.append("Authorization", `Bearer ${authToken}`);
+        const text = await res.text();
+        if (res.ok) {
+          Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: text,
+          }).then(() => {
+            location.reload();
+          });
         } else {
-            window.location.href = '/login.html';
+          throw new Error(text || 'Failed to add product');
         }
-
-        const requestOptions = {
-            method: "GET",
-            headers: myHeaders,
-            redirect: "follow"
-        };
-
-        fetch("http://localhost:8080/api/products/my", requestOptions)
-            .then(response => {
-                if (!response.ok) {
-                    return response.json().then(errorData => {
-                        throw new Error(errorData.message || 'Failed to fetch products');
-                    });
-                }
-                return response.json();
-            })
-            .then(result => {
-                const productList = document.getElementById('product-list');
-                productList.innerHTML = '';
-                if (result && result.length > 0) {
-                    result.forEach(product => {
-                        const productCard = document.createElement('div');
-                        productCard.className = 'product-card';
-
-                        let imageContent = '';
-                        if (product.imageNames && product.imageNames.length > 1) {
-                            // Create carousel for multiple images
-                            imageContent = `<div class="swiper">
-                                            <div class="swiper-wrapper">`;
-                            product.imageNames.forEach(imageName => {
-                                imageContent += `<div class="swiper-slide">
-                                                    <img src="http://localhost:8080/uploads/${imageName}" alt="${product.name}" class="product-card-image">
-                                                </div>`;
-                            });
-                            imageContent += `</div>
-                                            <div class="swiper-pagination"></div>
-                                        </div>`;
-                        } else if (product.imageNames && product.imageNames.length === 1) {
-                            // Display single image
-                            imageContent = `<img src="http://localhost:8080/uploads/${product.imageNames[0]}" alt="${product.name}" class="product-card-image">`;
-                        } else {
-                            // Display placeholder
-                            imageContent = `<img src="https://via.placeholder.com/150" alt="${product.name}" class="product-card-image">`;
-                        }
-
-                        productCard.innerHTML = `
-                            ${imageContent}
-                            <h2 class="product-card-title">${product.title}</h2>
-                            <p class="product-card-description">${product.description}</p>
-                            <p class="product-card-price">Price: $${product.price}</p>
-                            <a href="/product-detail.html?id=${product.id}" class="btn-primary">View Details</a>
-                            <div class="flex gap-2 mt-3">
-  <button onclick="deleteProduct(${product.id})" class="btn-primary bg-red-500 hover:bg-red-700">Delete</button>
-  <button onclick="showUpdateForm(${product.id})" class="btn-primary bg-yellow-500 hover:bg-yellow-600">Update</button>
-</div>
-
-                        `;
-                        productList.appendChild(productCard);
-
-                         if (product.imageNames && product.imageNames.length > 1) {
-                            // Initialize Swiper carousel
-                            const swiper = new Swiper(productCard.querySelector('.swiper'), {
-                                // Optional parameters
-                                direction: 'horizontal',
-                                loop: true,
-                                // If we need pagination
-                                // pagination: {
-                                //     el: '.swiper-pagination',
-                                // },
-                                // Navigation arrows
-                                // navigation: {
-                                //     nextEl: '.swiper-button-next',
-                                //     prevEl: '.swiper-button-prev',
-                                // },
-                                // And if we need scrollbar
-                                scrollbar: {
-                                    el: '.swiper-scrollbar',
-                                },
-                            });
-                        }
-                    });
-                } else {
-                    productList.innerHTML = '<div class="text-center col-span-full"><p class="text-gray-500">No products found.</p></div>';
-                }
-            })
-            .catch(error => {
-                const productList = document.getElementById('product-list');
-                productList.innerHTML = `<div class="text-center col-span-full text-red-500">${error.message}</div>`;
-                console.error(error);
-            });
-            function deleteProduct(productId) {
-  if (!confirm("Are you sure you want to delete this product?")) return;
-
-  const user = JSON.parse(localStorage.getItem("user"));
-  if (!user || !user.token) {
-    alert("You must be logged in to delete a product.");
-    return;
-  }
-
-  fetch(`http://localhost:8080/api/products/delete/${productId}`, {
-    method: "DELETE",
-    headers: {
-      "Authorization": `Bearer ${user.token}`
-    }
-  })
-    .then(res => {
-      if (!res.ok) throw new Error("Failed to delete product");
-      alert("Product deleted successfully");
-      location.reload();
-    })
-    .catch(err => {
-      alert("Error deleting product");
-      console.error(err);
+      } catch (err) {
+        console.error('Error adding product:', err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: err.message || 'Error adding product',
+        });
+      }
     });
-}
 
+    // Edit Product
+    function openEditForm(product) {
+      const editForm = document.getElementById('edit-product-form');
+      editForm.querySelector('input[name="id"]').value = product.id;
+      editForm.querySelector('input[name="title"]').value = product.title;
+      editForm.querySelector('input[name="category"]').value = product.category;
+      editForm.querySelector('input[name="price"]').value = product.price;
+      editForm.querySelector('textarea[name="description"]').value = product.description;
+      toggleForm('edit');
+    }
 
-    </script>
+    const editForm = document.getElementById('edit-product-form');
+    editForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (!user || !user.token) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Not Authenticated',
+          text: 'Please log in to edit a product.',
+        }).then(() => {
+          window.location.href = '/login.html';
+        });
+        return;
+      }
+
+      const formData = new FormData(editForm);
+      const productId = formData.get('id');
+
+      try {
+        const res = await fetch(`http://localhost:8080/api/products/update/${productId}`, {
+          method: "PUT",
+          headers: {
+            "Authorization": `Bearer ${user.token}`
+          },
+          body: formData
+        });
+
+        const text = await res.text();
+        if (res.ok) {
+          Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: text,
+          }).then(() => {
+            location.reload();
+          });
+        } else {
+          throw new Error(text || 'Failed to update product');
+        }
+      } catch (err) {
+        console.error('Error updating product:', err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: err.message || 'Error updating product',
+        });
+      }
+    });
+
+    // Delete Product
+    async function deleteProduct(productId) {
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (!user || !user.token) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Not Authenticated',
+          text: 'Please log in to delete a product.',
+        }).then(() => {
+          window.location.href = '/login.html';
+        });
+        return;
+      }
+
+      const confirmation = await Swal.fire({
+        icon: 'warning',
+        title: 'Are you sure?',
+        text: 'This will permanently delete the product.',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'Cancel',
+      });
+
+      if (!confirmation.isConfirmed) return;
+
+      try {
+        const res = await fetch(`http://localhost:8080/api/products/delete/${productId}`, {
+          method: "DELETE",
+          headers: {
+            "Authorization": `Bearer ${user.token}`
+          }
+        });
+
+        const text = await res.text();
+        if (res.ok) {
+          Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: text,
+          }).then(() => {
+            location.reload();
+          });
+        } else {
+          throw new Error(text || 'Failed to delete product');
+        }
+      } catch (err) {
+        console.error('Error deleting product:', err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: err.message || 'Error deleting product',
+        });
+      }
+    }
+
+    // Fetch Products
+    const myHeaders = new Headers();
+    const user = localStorage.getItem('user');
+    if (!user) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Not Authenticated',
+        text: 'Please log in to view your products.',
+      }).then(() => {
+        window.location.href = '/login.html';
+      });
+    } else {
+      const authToken = JSON.parse(user).token;
+      myHeaders.append("Authorization", `Bearer ${authToken}`);
+
+      const requestOptions = {
+        method: "GET",
+        headers: myHeaders,
+        redirect: "follow"
+      };
+
+      fetch("http://localhost:8080/api/products/my", requestOptions)
+        .then(response => {
+          if (!response.ok) {
+            return response.text().then(text => {
+              throw new Error(text || 'Failed to fetch products');
+            });
+          }
+          return response.json();
+        })
+        .then(result => {
+          const productList = document.getElementById('product-list');
+          productList.innerHTML = '';
+          if (result && result.length > 0) {
+            result.forEach(product => {
+              const productCard = document.createElement('div');
+              productCard.className = 'bg-white rounded-xl shadow-lg p-5 transition-transform hover:-translate-y-1 hover:shadow-xl duration-300';
+
+              let imageContent = '';
+              const uniqueId = `swiper-${product.id}`;
+
+              if (product.imageNames?.length > 1) {
+                imageContent = `<div class="swiper ${uniqueId} rounded-md mb-4 h-48 overflow-hidden">
+                  <div class="swiper-wrapper">
+                    ${product.imageNames.map(image =>
+                      `<div class="swiper-slide"><img src="http://localhost:8080/uploads/${image}" class="w-full h-48 object-cover" /></div>`
+                    ).join('')}
+                  </div>
+                  <div class="swiper-pagination"></div>
+                </div>`;
+              } else if (product.imageNames?.length === 1) {
+                imageContent = `<img src="http://localhost:8080/uploads/${product.imageNames[0]}" alt="${product.title}" class="rounded-md mb-4 w-full h-48 object-cover" />`;
+              } else {
+                imageContent = `<img src="https://via.placeholder.com/300x200?text=No+Image" class="rounded-md mb-4 w-full h-48 object-cover" />`;
+              }
+
+              productCard.innerHTML = `
+                ${imageContent}
+                <h2 class="text-xl font-semibold text-gray-800 mb-2">${product.title}</h2>
+                <span class="inline-block bg-blue-100 text-blue-700 text-xs font-medium px-2 py-1 rounded-full w-max mb-2">${product.category}</span>
+                <p class="text-gray-600 mb-2">${product.description}</p>
+                <p class="text-blue-700 font-bold text-lg mb-4">💲${product.price}</p>
+                <div class="flex space-x-2">
+                  <button onclick='openEditForm(${JSON.stringify(product)})' class="bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-2 px-4 rounded-lg transition">Edit</button>
+                  <button onclick="deleteProduct(${product.id})" class="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-lg transition">Delete</button>
+                </div>
+              `;
+              productList.appendChild(productCard);
+
+              if (product.imageNames?.length > 1) {
+                new Swiper(`.${uniqueId}`, {
+                  direction: 'horizontal',
+                  loop: true,
+                  pagination: {
+                    el: `.${uniqueId} .swiper-pagination`,
+                    clickable: true,
+                  }
+                });
+              }
+            });
+          } else {
+            productList.innerHTML = '<div class="text-center col-span-full"><p class="text-gray-500">You have no products listed.</p></div>';
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching products:', error);
+          const productList = document.getElementById('product-list');
+          productList.innerHTML = `<div class="text-center col-span-full text-red-500">${error.message}</div>`;
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: error.message || 'Failed to load products',
+          });
+        });
+    }
+  </script>
 </body>
 </html>

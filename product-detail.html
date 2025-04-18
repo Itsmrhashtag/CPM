@@ -1,198 +1,145 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Product Details - Car Part Marketplace</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://unpkg.com/swiper@8/swiper-bundle.min.css"/>
-    <script src="https://unpkg.com/swiper@8/swiper-bundle.min.js"></script>
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .product-detail {
-            background: white;
-            border-radius: 0.75rem;
-            padding: 20px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        }
-        .carousel {
-            margin-bottom: 1rem;
-            border-radius: 0.5rem;
-            overflow: hidden;
-        }
-        .carousel-images {
-            display: flex;
-            overflow-x: auto;
-            scroll-snap-type: x mandatory;
-            width: 100%;
-        }
-        .carousel-images img {
-            width: 100%;
-            max-height: 300px;
-            object-fit: cover;
-            scroll-snap-align: start;
-            flex-shrink: 0;
-        }
-        .product-detail h1 {
-            margin-bottom: 1.5rem;
-            font-size: 2.25rem;
-            font-weight: 600;
-            color: #1e293b;
-        }
-        .product-detail h3 {
-            margin: 1.25rem 0;
-            font-size: 1.5rem;
-            font-weight: 500;
-            color: #334155;
-        }
-        .product-detail p {
-            margin: 0.5rem 0;
-            font-size: 1rem;
-            color: #4b5563;
-        }
-        .seller-info {
-            font-size: 0.875rem;
-            color: #6b7280;
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid #e5e7eb;
-        }
-        .buy-button {
-            @apply bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2.5 px-6 rounded-md shadow-md transition-colors duration-200 ease-in-out mt-6 w-full text-center;
-            font-size: 1.125rem;
-        }
-        .swiper {
-            width: 100%;
-            height: 300px;
-            border-radius: 0.5rem;
-            overflow: hidden;
-            margin-bottom: 1rem;
-        }
-        .swiper-slide {
-            text-align: center;
-            font-size: 18px;
-            background: #fff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .swiper-slide img {
-            display: block;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .swiper-pagination-bullet-active {
-            background-color: #3b82f6; /* Tailwind's blue-500 */
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Product Details - CarPartMarketplace</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://unpkg.com/swiper@8/swiper-bundle.min.css"/>
+  <script src="https://unpkg.com/swiper@8/swiper-bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    .swiper {
+      width: 100%;
+      height: 300px;
+      border-radius: 0.75rem;
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+    }
+    .swiper-slide img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .swiper-pagination-bullet-active {
+      background-color: #3b82f6;
+    }
+  </style>
 </head>
 <body class="bg-gray-100">
-    <div class="container">
-        <div class="product-detail" id="productDetail">
-            </div>
+  <!-- Header -->
+  <header class="bg-gradient-to-r from-blue-700 to-blue-500 text-white shadow-md">
+    <div class="max-w-7xl mx-auto px-6 py-5">
+      <h1 class="text-3xl font-bold text-center">🔍 Product Details</h1>
     </div>
-    <script>
-        // Get the product ID from the URL query string
-        const urlParams = new URLSearchParams(window.location.search);
-        const productId = urlParams.get('id');
+  </header>
 
-        async function fetchProductDetails() {
-    const user = JSON.parse(localStorage.getItem('user')); // Retrieve user info from localStorage
+  <!-- Main Section -->
+  <main class="max-w-7xl mx-auto px-6 py-10">
+    <div class="bg-white rounded-xl shadow-lg p-6 md:p-8 transition-transform hover:-translate-y-1 hover:shadow-xl duration-300">
+      <div id="productDetail">
+        <p class="text-gray-500 text-lg text-center">Loading product details...</p>
+      </div>
+    </div>
+  </main>
 
+  <!-- JS Section -->
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const productId = urlParams.get('id');
+
+    const user = JSON.parse(localStorage.getItem('user'));
     if (!user || !user.token) {
-        alert("Please log in to view product details.");
-        return;
-    }
-
-    try {
-        const response = await fetch(`http://localhost:8080/api/products/${productId}`, {
+      Swal.fire({
+        icon: 'error',
+        title: 'Not Authenticated',
+        text: 'Please log in to view product details.',
+      }).then(() => {
+        window.location.href = '/login.html';
+      });
+    } else {
+      async function fetchProductDetails() {
+        try {
+          const response = await fetch(`http://localhost:8080/api/products/${productId}`, {
             method: 'GET',
             headers: {
-                'Authorization': `Bearer ${user.token}`, // Include the Bearer token in the headers
+              'Authorization': `Bearer ${user.token}`
             }
-        });
+          });
 
-        const product = await response.json();
+          if (!response.ok) {
+            throw new Error('Failed to fetch product details');
+          }
 
-        const productDetail = document.getElementById("productDetail");
+          const product = await response.json();
+          const productDetail = document.getElementById("productDetail");
 
-        let imagesHTML = '';
-        if (product.imageNames && product.imageNames.length > 1) {
-            // Use Swiper carousel for multiple images
-            imagesHTML = `<div class="swiper">
-                            <div class="swiper-wrapper">`;
-            product.imageNames.forEach(imageName => {
-                imagesHTML += `<div class="swiper-slide">
-                                <img src="http://localhost:8080/uploads/${imageName}" alt="${product.title} image" />
-                              </div>`;
-            });
-            imagesHTML += `</div>
+          let imagesHTML = '';
+          const uniqueId = `swiper-${product.id || 'product'}`;
+          if (product.imageNames && product.imageNames.length > 1) {
+            imagesHTML = `<div class="swiper ${uniqueId} mb-6">
+                            <div class="swiper-wrapper">
+                              ${product.imageNames.map(imageName =>
+                                `<div class="swiper-slide">
+                                  <img src="http://localhost:8080/uploads/${imageName}" alt="${product.title}" />
+                                </div>`).join('')}
+                            </div>
                             <div class="swiper-pagination"></div>
-                        </div>`;
-        } else if (product.imageNames && product.imageNames.length === 1) {
-            // Display single image
-            imagesHTML = `<div class="carousel">
-                            <div class="carousel-images">
-                                <img src="http://localhost:8080/uploads/${product.imageNames[0]}" alt="${product.title} image" />
-                            </div>
                           </div>`;
-        } else {
-            // Display placeholder
-            imagesHTML = `<div class="carousel">
-                            <div class="carousel-images">
-                                <img src="https://via.placeholder.com/150" alt="${product.title} image" />
-                            </div>
-                          </div>`;
-        }
+          } else {
+            const imageSrc = product.imageNames && product.imageNames.length === 1
+              ? `http://localhost:8080/uploads/${product.imageNames[0]}`
+              : 'https://via.placeholder.com/300x200?text=No+Image';
 
-        productDetail.innerHTML = `
-            <h1>${product.title}</h1>
+            imagesHTML = `<img src="${imageSrc}" alt="${product.title}" class="w-full h-72 object-cover rounded-md mb-6" />`;
+          }
+
+          productDetail.innerHTML = `
             ${imagesHTML}
-            <h3>Price: ₹${product.price}</h3>
-            <p><strong>Category:</strong> ${product.category}</p>
-            <p><strong>Description:</strong> ${product.description}</p>
-            <div class="seller-info">
-                <p><strong>Seller:</strong> ${product.seller.name}</p>
-                <p><strong>Location:</strong> ${product.seller.address} (${product.seller.pinCode})</p>
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">${product.title}</h2>
+            <p class="text-lg font-bold text-blue-700 mb-4">💲${product.price}</p>
+            <p class="text-gray-600 mb-4"><strong>Category:</strong> ${product.category || 'N/A'}</p>
+            <p class="text-gray-600 mb-6"><strong>Description:</strong> ${product.description || 'N/A'}</p>
+            <div class="border-t-2 border-gray-200 pt-4">
+              <p class="text-gray-600 mb-2"><strong>Seller:</strong> ${product.seller?.name || 'N/A'}</p>
+              <p class="text-gray-600"><strong>Location:</strong> ${product.seller?.address || 'N/A'} (${product.seller?.pinCode || 'N/A'})</p>
             </div>
-            <button class="buy-button" id="buy-button">Buy Now</button>
-        `;
+            <button class="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-md shadow-md transition duration-200" id="buy-button">
+              Buy Now
+            </button>
+          `;
 
-        // Initialize Swiper if multiple images
-        if (product.imageNames && product.imageNames.length > 1) {
-            const swiper = new Swiper(productDetail.querySelector('.swiper'), {
-                direction: 'horizontal',
-                loop: true,
-                pagination: {
-                    el: '.swiper-pagination',
-                },
+          if (product.imageNames && product.imageNames.length > 1) {
+            new Swiper(`.${uniqueId}`, {
+              loop: true,
+              pagination: {
+                el: `.${uniqueId} .swiper-pagination`,
+                clickable: true,
+              }
             });
-        }
+          }
 
-        // Add event listener to the Buy Now button
-        const buyButton = document.getElementById('buy-button');
-        buyButton.addEventListener('click', () => {
-            // Redirect to checkout page with product ID
+          document.getElementById('buy-button').addEventListener('click', () => {
             window.location.href = `/checkout.html?productId=${product.id}`;
-        });
+          });
 
-    } catch (error) {
-        console.error("Failed to load product details:", error);
-        const productDetail = document.getElementById("productDetail");
-        productDetail.innerHTML = `<p class="text-red-500">Failed to load product details: ${error.message}</p>`;
+        } catch (error) {
+          console.error('Error fetching product details:', error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Failed to load product details. Please try again later.',
+          });
+          document.getElementById("productDetail").innerHTML = `<p class="text-red-500 text-center">Failed to load product details: ${error.message}</p>`;
+        }
+      }
+
+      fetchProductDetails();
     }
-}
-
-
-        fetchProductDetails();
-    </script>
+  </script>
 </body>
 </html>
